@@ -7328,6 +7328,7 @@
       references: "REFERENCE PHOTOS",
       downloads: "DOWNLOADS",
       refVideo: "Ref Video",
+      hdr: "HDR",
       notesTitle: "VFX NOTES",
       shortDescription: "Short description",
       notes: "Notes",
@@ -7359,6 +7360,7 @@
       references: "Reference Photos",
       downloads: "Downloads",
       refVideo: "Ref Video",
+      hdr: "HDR",
       notesTitle: "VFX Notes",
       shortDescription: "Short description",
       notes: "Notes",
@@ -7369,14 +7371,35 @@
       emptyMaterials: "No materials yet"
     };
 
-    const REF_VIDEO_ARCHIVES = {
+    // Paste public Yandex.Disk folder links here when they are ready.
+    const SCENE_MATERIAL_LINKS = {
       "1a-b": {
-        href: "https://github.com/metaphasevfx-arch/vfx-report/releases/latest/download/scene-1a-b-ref-video.zip",
-        fileName: "scene-1a-b-ref-video.zip"
+        refVideo: "https://disk.yandex.ru/d/58KSwhQ7iaSZYQ",
+        hdr: "https://disk.yandex.ru/d/yz74RcndbbVDCg"
       },
       "kat 1abc": {
-        href: "https://github.com/metaphasevfx-arch/vfx-report/releases/latest/download/scene-kat-1abc-ref-video.zip",
-        fileName: "scene-kat-1abc-ref-video.zip"
+        refVideo: "https://disk.yandex.ru/d/yz74RcndbbVDCg"
+      },
+      "3": {
+        hdr: "https://disk.yandex.ru/d/muaV_Jx7CCWQWg"
+      },
+      "6-6.1": {
+        hdr: "https://disk.yandex.ru/d/VjZnFmeB3O1NAQ"
+      },
+      "2.1-2": {
+        hdr: "https://disk.yandex.ru/d/qQA2M6ypzSeASw"
+      },
+      "4": {
+        hdr: "https://disk.yandex.ru/d/dL3B0jNymXk8sw"
+      },
+      "kat 5": {
+        hdr: "https://disk.yandex.ru/d/btabLt1uq__rZQ"
+      },
+      "kat 4": {
+        hdr: "https://disk.yandex.ru/d/WcNJV0DuhcexMQ"
+      },
+      "kat 6-6.1": {
+        hdr: "https://disk.yandex.ru/d/02T6MXiyQitrHQ"
       }
     };
 
@@ -8059,13 +8082,21 @@
         `;
       }
 
-      const refVideoArchive = refVideoArchiveForScene(scene);
-      if (!refVideoArchive) {
+      const materials = sceneMaterialsForLinks(scene);
+      const materialButtons = [];
+      if (materials.refVideo) {
+        materialButtons.push(`<a class="asset-button" href="${escapeAttr(materials.refVideo)}" target="_blank" rel="noopener noreferrer">${escapeHTML(labels.refVideo)}</a>`);
+      }
+      if (materials.hdr) {
+        materialButtons.push(`<a class="asset-button" href="${escapeAttr(materials.hdr)}" target="_blank" rel="noopener noreferrer">${escapeHTML(labels.hdr)}</a>`);
+      }
+
+      if (!materialButtons.length) {
         elements.downloadsContainer.innerHTML = `<p class="empty-note">${labels.emptyMaterials}</p>`;
       } else {
         elements.downloadsContainer.innerHTML = `
           <div class="asset-grid">
-            <a class="asset-button" href="${escapeAttr(refVideoArchive.href)}" download="${escapeAttr(refVideoArchive.fileName)}">${escapeHTML(labels.refVideo)}</a>
+            ${materialButtons.join("")}
           </div>
         `;
       }
@@ -8148,9 +8179,18 @@
       return sceneDisplayNumber(scene?.name);
     }
 
-    function refVideoArchiveForScene(scene) {
-      const key = String(scene?.name || "").trim().toLowerCase();
-      return REF_VIDEO_ARCHIVES[key] || null;
+    function normalizeSceneKey(sceneName) {
+      return String(sceneName || "").trim().toLowerCase().replace(/\s+/g, " ");
+    }
+
+    function sceneMaterialsForLinks(scene) {
+      const key = normalizeSceneKey(scene?.name);
+      const value = SCENE_MATERIAL_LINKS[key];
+      if (!value) return {};
+      return {
+        refVideo: String(value.refVideo || "").trim(),
+        hdr: String(value.hdr || "").trim()
+      };
     }
 
     function normalizeText(raw) {
