@@ -47,6 +47,7 @@
           <div class="sidebar-project-name" id="projectFooterName">—</div>
         </div>
       </aside>
+      <button class="sidebar-backdrop" id="sidebarBackdrop" type="button" aria-label="Close sidebar"></button>
 
       <main class="main">
         <section class="card control-card" id="controlCard"></section>
@@ -7398,10 +7399,13 @@
       notesText: document.getElementById("notesText"),
       paramsTitle: document.getElementById("paramsTitle"),
       paramsGrid: document.getElementById("paramsGrid"),
+      sidebarBackdrop: document.getElementById("sidebarBackdrop"),
       lightbox: document.getElementById("lightbox"),
       lightboxClose: document.getElementById("lightboxClose"),
       lightboxImage: document.getElementById("lightboxImage")
     };
+
+    let wasMobileViewport = isMobileViewport();
 
     elements.modeDays.addEventListener("click", () => {
       state.mode = "days";
@@ -7414,13 +7418,22 @@
     elements.sidebarToggle.addEventListener("click", () => {
       elements.app.classList.toggle("sidebar-hidden");
     });
+    elements.sidebarBackdrop.addEventListener("click", () => {
+      closeSidebar();
+    });
     elements.lightboxClose.addEventListener("click", closeLightbox);
     elements.lightbox.addEventListener("click", (event) => {
       if (event.target === elements.lightbox) closeLightbox();
     });
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeLightbox();
+      if (event.key === "Escape") {
+        closeLightbox();
+        closeSidebar();
+      }
     });
+    window.addEventListener("resize", syncResponsiveSidebarState);
+
+    syncResponsiveSidebarState();
 
     init();
 
@@ -7468,6 +7481,31 @@
       elements.notesTitle.textContent = labels.notesTitle;
       elements.shortLabel.textContent = labels.shortDescription;
       elements.notesLabel.textContent = labels.notes;
+    }
+
+    function isMobileViewport() {
+      return window.matchMedia("(max-width: 900px)").matches;
+    }
+
+    function closeSidebar() {
+      if (isMobileViewport()) {
+        elements.app.classList.add("sidebar-hidden");
+      }
+    }
+
+    function syncResponsiveSidebarState() {
+      const isMobile = isMobileViewport();
+
+      if (isMobile && !wasMobileViewport) {
+        elements.app.classList.add("sidebar-hidden");
+      } else if (!isMobile && wasMobileViewport) {
+        elements.app.classList.remove("sidebar-hidden");
+      } else if (isMobile && !elements.app.classList.contains("sidebar-hidden")) {
+        // Keep the main content visible first on phones.
+        elements.app.classList.add("sidebar-hidden");
+      }
+
+      wasMobileViewport = isMobile;
     }
 
     function days() {
@@ -7737,6 +7775,7 @@
           ensureSelection();
           renderSidebar();
           renderMain();
+          closeSidebar();
         });
       });
 
