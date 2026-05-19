@@ -7329,6 +7329,7 @@
       downloads: "DOWNLOADS",
       refVideo: "Ref Video",
       hdr: "HDR",
+      photogrammetry: "Photogrammetry",
       notesTitle: "VFX NOTES",
       shortDescription: "Short description",
       notes: "Notes",
@@ -7361,6 +7362,7 @@
       downloads: "Downloads",
       refVideo: "Ref Video",
       hdr: "HDR",
+      photogrammetry: "Photogrammetry",
       notesTitle: "VFX Notes",
       shortDescription: "Short description",
       notes: "Notes",
@@ -7389,6 +7391,7 @@
       "cat 6-6.1"
     ];
     const SCENE_ORDER_INDEX = new Map(SCENE_ORDER.map((value, index) => [value, index]));
+    const EJ_PHOTOGRAMMETRY_LINK = "https://disk.yandex.ru/d/ee9MBBtxGX6g0g";
 
     // Paste public Yandex.Disk folder links here when they are ready.
     const SCENE_MATERIAL_LINKS = {
@@ -8158,6 +8161,9 @@
       if (materials.hdr) {
         materialButtons.push(`<a class="asset-button" href="${escapeAttr(materials.hdr)}" target="_blank" rel="noopener noreferrer">${escapeHTML(labels.hdr)}</a>`);
       }
+      if (materials.photogrammetry) {
+        materialButtons.push(`<a class="asset-button" href="${escapeAttr(materials.photogrammetry)}" target="_blank" rel="noopener noreferrer">${escapeHTML(labels.photogrammetry)}</a>`);
+      }
 
       if (!materialButtons.length) {
         elements.downloadsContainer.innerHTML = `<p class="empty-note">${labels.emptyMaterials}</p>`;
@@ -8253,11 +8259,12 @@
 
     function sceneMaterialsForLinks(scene) {
       const key = normalizeSceneKey(scene?.name);
-      const value = SCENE_MATERIAL_LINKS[key];
-      if (!value) return {};
+      const value = SCENE_MATERIAL_LINKS[key] || {};
+      const isEjScene = key.startsWith("ej ");
       return {
         refVideo: String(value.refVideo || "").trim(),
-        hdr: String(value.hdr || "").trim()
+        hdr: String(value.hdr || "").trim(),
+        photogrammetry: String(value.photogrammetry || (isEjScene ? EJ_PHOTOGRAMMETRY_LINK : "")).trim()
       };
     }
 
