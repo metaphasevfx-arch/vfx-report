@@ -7329,6 +7329,7 @@
       downloads: "DOWNLOADS",
       refVideo: "Ref Video",
       hdr: "HDR",
+      lidarScan: "Lidar Scan",
       photogrammetry: "Photogrammetry",
       notesTitle: "VFX NOTES",
       shortDescription: "Short description",
@@ -7362,6 +7363,7 @@
       downloads: "Downloads",
       refVideo: "Ref Video",
       hdr: "HDR",
+      lidarScan: "Lidar Scan",
       photogrammetry: "Photogrammetry",
       notesTitle: "VFX Notes",
       shortDescription: "Short description",
@@ -7392,15 +7394,19 @@
     ];
     const SCENE_ORDER_INDEX = new Map(SCENE_ORDER.map((value, index) => [value, index]));
     const EJ_PHOTOGRAMMETRY_LINK = "https://disk.yandex.ru/d/ee9MBBtxGX6g0g";
+    const CAT_6_6_1_SCAN_LINK = "";
+    const CAT_6_6_1_PHOTOGRAMMETRY_LINK = "";
+    const CAT_1ABC_PHOTOGRAMMETRY_LINK = "";
 
     // Paste public Yandex.Disk folder links here when they are ready.
     const SCENE_MATERIAL_LINKS = {
       "ej 1a-b": {
         refVideo: "https://disk.yandex.ru/d/58KSwhQ7iaSZYQ",
-        hdr: "https://disk.yandex.ru/d/yz74RcndbbVDCg"
+        hdr: ""
       },
       "cat 1abc": {
-        refVideo: "https://disk.yandex.ru/d/yz74RcndbbVDCg"
+        refVideo: "https://disk.yandex.ru/d/yz74RcndbbVDCg",
+        photogrammetry: CAT_1ABC_PHOTOGRAMMETRY_LINK
       },
       "ej 3": {
         hdr: "https://disk.yandex.ru/d/muaV_Jx7CCWQWg"
@@ -7421,7 +7427,9 @@
         hdr: "https://disk.yandex.ru/d/WcNJV0DuhcexMQ"
       },
       "cat 6-6.1": {
-        hdr: "https://disk.yandex.ru/d/02T6MXiyQitrHQ"
+        hdr: "https://disk.yandex.ru/d/02T6MXiyQitrHQ",
+        scan: CAT_6_6_1_SCAN_LINK,
+        photogrammetry: CAT_6_6_1_PHOTOGRAMMETRY_LINK
       }
     };
 
@@ -8161,6 +8169,9 @@
       if (materials.hdr) {
         materialButtons.push(`<a class="asset-button" href="${escapeAttr(materials.hdr)}" target="_blank" rel="noopener noreferrer">${escapeHTML(labels.hdr)}</a>`);
       }
+      if (materials.scan) {
+        materialButtons.push(`<a class="asset-button" href="${escapeAttr(materials.scan)}" target="_blank" rel="noopener noreferrer">${escapeHTML(labels.lidarScan)}</a>`);
+      }
       if (materials.photogrammetry) {
         materialButtons.push(`<a class="asset-button" href="${escapeAttr(materials.photogrammetry)}" target="_blank" rel="noopener noreferrer">${escapeHTML(labels.photogrammetry)}</a>`);
       }
@@ -8264,6 +8275,7 @@
       return {
         refVideo: String(value.refVideo || "").trim(),
         hdr: String(value.hdr || "").trim(),
+        scan: String(value.scan || "").trim(),
         photogrammetry: String(value.photogrammetry || (isEjScene ? EJ_PHOTOGRAMMETRY_LINK : "")).trim()
       };
     }
