@@ -66,6 +66,11 @@
               <div id="referenceContainer"></div>
             </section>
 
+            <section class="card section-card">
+              <h3 class="section-title" id="downloadsTitle">DOWNLOADS</h3>
+              <div id="downloadsContainer"></div>
+            </section>
+
             <section class="card section-card notes-card">
               <div class="section-head">
                 <h3 class="section-title" id="notesTitle">VFX NOTES</h3>
@@ -7321,13 +7326,16 @@
       multicam: "Multi-cam",
       still: "CAMERA STILL",
       references: "REFERENCE PHOTOS",
+      downloads: "DOWNLOADS",
+      refVideo: "Ref Video",
       notesTitle: "VFX NOTES",
       shortDescription: "Short description",
       notes: "Notes",
       paramsBase: "CAMERA PARAMETERS",
       dayWord: "День",
       sceneWord: "сцен",
-      emptyPhotos: "Фото пока нет"
+      emptyPhotos: "Фото пока нет",
+      emptyMaterials: "Материалы пока не добавлены"
     };
 
     const LABELS_EN = {
@@ -7349,13 +7357,27 @@
       multicam: "Multi-cam",
       still: "Camera Still",
       references: "Reference Photos",
+      downloads: "Downloads",
+      refVideo: "Ref Video",
       notesTitle: "VFX Notes",
       shortDescription: "Short description",
       notes: "Notes",
       paramsBase: "Camera Parameters",
       dayWord: "Day",
       sceneWord: "scenes",
-      emptyPhotos: "No photos yet"
+      emptyPhotos: "No photos yet",
+      emptyMaterials: "No materials yet"
+    };
+
+    const REF_VIDEO_ARCHIVES = {
+      "1a-b": {
+        href: "https://github.com/metaphasevfx-arch/vfx-report/releases/latest/download/scene-1a-b-ref-video.zip",
+        fileName: "scene-1a-b-ref-video.zip"
+      },
+      "kat 1abc": {
+        href: "https://github.com/metaphasevfx-arch/vfx-report/releases/latest/download/scene-kat-1abc-ref-video.zip",
+        fileName: "scene-kat-1abc-ref-video.zip"
+      }
     };
 
     const state = {
@@ -7392,6 +7414,8 @@
       stillContainer: document.getElementById("stillContainer"),
       referenceTitle: document.getElementById("referenceTitle"),
       referenceContainer: document.getElementById("referenceContainer"),
+      downloadsTitle: document.getElementById("downloadsTitle"),
+      downloadsContainer: document.getElementById("downloadsContainer"),
       notesTitle: document.getElementById("notesTitle"),
       shortLabel: document.getElementById("shortLabel"),
       notesLabel: document.getElementById("notesLabel"),
@@ -7478,6 +7502,7 @@
       elements.projectFooterTitle.textContent = (labels.projects || labels.project).toUpperCase();
       elements.stillTitle.textContent = labels.still;
       elements.referenceTitle.textContent = labels.references;
+      elements.downloadsTitle.textContent = labels.downloads;
       elements.notesTitle.textContent = labels.notesTitle;
       elements.shortLabel.textContent = labels.shortDescription;
       elements.notesLabel.textContent = labels.notes;
@@ -7800,6 +7825,7 @@
         elements.controlCard.innerHTML = `<p class="empty-note">${labels.noData}</p>`;
         elements.stillContainer.innerHTML = `<p class="empty-note">${labels.noData}</p>`;
         elements.referenceContainer.innerHTML = `<p class="empty-note">${labels.noData}</p>`;
+        elements.downloadsContainer.innerHTML = `<p class="empty-note">${labels.noData}</p>`;
         elements.shortText.textContent = labels.noValue;
         elements.notesText.textContent = labels.noValue;
         elements.paramsGrid.innerHTML = "";
@@ -8033,6 +8059,17 @@
         `;
       }
 
+      const refVideoArchive = refVideoArchiveForScene(scene);
+      if (!refVideoArchive) {
+        elements.downloadsContainer.innerHTML = `<p class="empty-note">${labels.emptyMaterials}</p>`;
+      } else {
+        elements.downloadsContainer.innerHTML = `
+          <div class="asset-grid">
+            <a class="asset-button" href="${escapeAttr(refVideoArchive.href)}" download="${escapeAttr(refVideoArchive.fileName)}">${escapeHTML(labels.refVideo)}</a>
+          </div>
+        `;
+      }
+
       elements.shortText.textContent = normalizeText(currentTake?.shortDescription);
       elements.notesText.textContent = normalizeText(currentTake?.notes);
 
@@ -8109,6 +8146,11 @@
 
     function sceneLabel(scene) {
       return sceneDisplayNumber(scene?.name);
+    }
+
+    function refVideoArchiveForScene(scene) {
+      const key = String(scene?.name || "").trim().toLowerCase();
+      return REF_VIDEO_ARCHIVES[key] || null;
     }
 
     function normalizeText(raw) {

@@ -520,6 +520,34 @@ body {
   display: block;
 }
 
+.asset-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.asset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #f2f8f3;
+  color: #1f6f33;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
+}
+
+.asset-button:hover {
+  background: #e8f3ea;
+  border-color: #cce2d0;
+  color: #155324;
+}
+
 .empty-note {
   font-size: 16px;
   color: var(--muted);
