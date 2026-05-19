@@ -862,7 +862,21 @@ body {
   }
 
   .control-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .control-cell:nth-child(1),
+  .control-cell:nth-child(6) {
+    grid-column: 1 / -1;
+  }
+
+  .multicam-buttons {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+
+  .multicam-button {
+    flex: 0 0 auto;
   }
 
   .control-value,
