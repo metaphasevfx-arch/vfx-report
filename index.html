@@ -7371,34 +7371,53 @@
       emptyMaterials: "No materials yet"
     };
 
+    const SCENE_ORDER = [
+      "ej 1a-b",
+      "ej 1a-b phone insert",
+      "ej 2.1-2",
+      "ej 3",
+      "ej 4",
+      "ej 5",
+      "ej 5.1",
+      "ej 6-6.1",
+      "cat 1abc",
+      "cat 2-2.1",
+      "cat 3",
+      "cat 4",
+      "cat 5",
+      "cat 5.1",
+      "cat 6-6.1"
+    ];
+    const SCENE_ORDER_INDEX = new Map(SCENE_ORDER.map((value, index) => [value, index]));
+
     // Paste public Yandex.Disk folder links here when they are ready.
     const SCENE_MATERIAL_LINKS = {
-      "1a-b": {
+      "ej 1a-b": {
         refVideo: "https://disk.yandex.ru/d/58KSwhQ7iaSZYQ",
         hdr: "https://disk.yandex.ru/d/yz74RcndbbVDCg"
       },
-      "kat 1abc": {
+      "cat 1abc": {
         refVideo: "https://disk.yandex.ru/d/yz74RcndbbVDCg"
       },
-      "3": {
+      "ej 3": {
         hdr: "https://disk.yandex.ru/d/muaV_Jx7CCWQWg"
       },
-      "6-6.1": {
+      "ej 6-6.1": {
         hdr: "https://disk.yandex.ru/d/VjZnFmeB3O1NAQ"
       },
-      "2.1-2": {
+      "ej 2.1-2": {
         hdr: "https://disk.yandex.ru/d/qQA2M6ypzSeASw"
       },
-      "4": {
+      "ej 4": {
         hdr: "https://disk.yandex.ru/d/dL3B0jNymXk8sw"
       },
-      "kat 5": {
+      "cat 5": {
         hdr: "https://disk.yandex.ru/d/btabLt1uq__rZQ"
       },
-      "kat 4": {
+      "cat 4": {
         hdr: "https://disk.yandex.ru/d/WcNJV0DuhcexMQ"
       },
-      "kat 6-6.1": {
+      "cat 6-6.1": {
         hdr: "https://disk.yandex.ru/d/02T6MXiyQitrHQ"
       }
     };
@@ -7505,6 +7524,7 @@
       }
 
       labels = dashboard?.meta?.language === "en" ? LABELS_EN : LABELS_RU;
+      normalizeSceneNamesAndOrder();
       applyMeta();
       ensureSelection();
       renderSidebar();
@@ -7558,6 +7578,54 @@
 
     function days() {
       return dashboard?.days || [];
+    }
+
+    function firstSceneTimestamp(scene) {
+      const timestamps = (scene?.takes || [])
+        .map((take) => Date.parse(String(take?.timestamp || "")))
+        .filter(Number.isFinite)
+        .sort((left, right) => left - right);
+      return timestamps.length ? timestamps[0] : Number.POSITIVE_INFINITY;
+    }
+
+    function normalizeSceneName(scene) {
+      const raw = String(scene?.name || "").trim();
+      const lower = raw.toLowerCase();
+
+      if (lower.startsWith("kat ")) return `Cat ${raw.slice(4).trim()}`;
+      if (lower.startsWith("cat ")) return `Cat ${raw.slice(4).trim()}`;
+      if (lower === "2-2.1") return "Cat 2-2.1";
+
+      if (lower === "6-6.1") {
+        // In source export both scenes share the same short name, so split by call-time block.
+        return firstSceneTimestamp(scene) >= Date.parse("2026-05-12T16:00:00.000Z")
+          ? "Cat 6-6.1"
+          : "Ej 6-6.1";
+      }
+
+      if (lower.startsWith("ej ")) return `Ej ${raw.slice(3).trim()}`;
+      return `Ej ${raw}`;
+    }
+
+    function normalizeSceneNamesAndOrder() {
+      days().forEach((day) => {
+        const sourceScenes = day?.scenes || [];
+        sourceScenes.forEach((scene) => {
+          scene.name = normalizeSceneName(scene);
+        });
+
+        day.scenes = sourceScenes.slice().sort((left, right) => {
+          const leftKey = normalizeSceneKey(left?.name);
+          const rightKey = normalizeSceneKey(right?.name);
+          const leftRank = SCENE_ORDER_INDEX.has(leftKey) ? SCENE_ORDER_INDEX.get(leftKey) : Number.POSITIVE_INFINITY;
+          const rightRank = SCENE_ORDER_INDEX.has(rightKey) ? SCENE_ORDER_INDEX.get(rightKey) : Number.POSITIVE_INFINITY;
+          if (leftRank !== rightRank) return leftRank - rightRank;
+
+          const byTime = firstSceneTimestamp(left) - firstSceneTimestamp(right);
+          if (Number.isFinite(byTime) && byTime !== 0) return byTime;
+          return String(left?.id || "").localeCompare(String(right?.id || ""));
+        });
+      });
     }
 
     function allSceneRefs() {
